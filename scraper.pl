@@ -98,10 +98,6 @@ sub grok_sheet
 		# Fix data
 		@data = map { $_ || 0 } @data;
 
-		# Construct the real row
-		#my @res = map { defined $_ ? $_ : () } @cat_path;
-		#$res[3] = $res[3] || undef;
-
 		my %row;
 		@row{@keys, @headings} = ($year, $month, $year.$month, $dept_code, $dept_human, @cat_path, @data);
 		my $key = join "|", map { $row{$_} } @id;
@@ -183,7 +179,9 @@ $parser->handler (start => sub {
 
 	return unless $tag eq 'a';
 	return unless exists $attr->{href};
-	return unless $attr->{href} =~ m{/.*za.rok.(\d\d\d\d)$};
+	return unless $attr->{href} =~ m{/.*za.rok.(\d\d\d\d)$}
+		or $attr->{href} =~ m{/.*kriminalita.(\d\d\d\d).xml$};
+	return unless $1 >= 2014;
 
 	process_year (new URI ($attr->{href})->abs ($root));
 }, 'tag, attr');
